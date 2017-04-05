@@ -1,42 +1,56 @@
 <?php
-if(isset($_POST['pseudo']) AND isset($_POST['mail']) AND isset($_POST['message']))//Si les variables existent
-{ 
-	if($_POST['pseudo']!= NULL AND $_POST['mail']!= NULL AND $_POST['message']!=NULL)// Si on a quelque chose à enregistrer
-	{
-		$pseudo = stripslashes($_POST['pseudo']);
-		$mail = stripslashes($_POST['mail']);
-		$message = stripslashes($_POST['message']);
+$erreurs = array();
 
-		$adresse = 'lou@yopmail.com';
-		$titre = "new message from: $pseudo";
-		$contenu = "$pseudo envoie le message suivant : \n\n$message \n\n Adresse mail du destinataire : $mail";
-		$headers = 'From : "Lou"<'.$mail.'>'."\n";
-		//Envoi de l'email :
-		
-
-		if(!mail($adresse,$titre,$contenu,$headers)){
-			echo "ERROR !";
-		}
-
-		//Affichage "mail envoyé" : 
-		echo "Votre message a bien été envoyé";
-	}
-	else{
-		echo "Votre message n'a pas été envoyé ! Cause : tous les champs doivent être remplis";
-	}
-	//$string = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut venenatis metus id posuere porttitor. Etiam ut tristique mauris. Donec gravida at magna vitae scelerisque. Cras eget luctus leo, eget mattis nunc. Nam vitae purus eu elit tempor elementum. Maecenas id odio fermentum, porttitor massa eget, efficitur enim. Etiam est quam, porta id eleifend in, volutpat sed risus.
-
-	//Pellentesque in bibendum nisi, eget ullamcorper nibh. Donec consectetur nec neque at vehicula. Integer eu luctus nibh. Vivamus semper sed.";
-	//if (strlen($string) > 500) {
-		//$trimstring = substr($string, 0, 500). 'Vous avez plus de 500 caractères';
-	//} else {
-		//$trimstring = $string;
+// Préparer la regexp
+$v = "/^[_a-z0-9-]+(\.[_a-z0-9-]+)*@[a-z0-9-]+(\.[a-z0-9-]+)*(\.[a-z]{2,})$/";
+ // Tester la présence d'erreur sur la variable attendue email
+if(!isset($_POST['mail'])){
+	$erreurs[]="Le mail n'est pas defini";
+}elseif(!preg_match($v, $_POST['mail'])){
+	$erreurs[]="Le mail n'est pas valide";
 }
-	//echo $trimstring;
-?>
 
+// Tester la présence d'erreur sur la variable attendue message
+if (!isset($_POST['message'])){
+	$erreurs[] = "Le message n'est pas défini";
+}elseif(strlen($_POST['message']) > 500) {
+	$erreurs[] = "Le message doit être inférieur à 500 caractères";
+} 
+
+// Tester la présence d'erreur sur la variable attendue pseudo
+if (!isset($_POST['pseudo'])){
+	$erreurs[] = "Le pseudo n'est pas défini";
+}elseif(strlen($_POST['pseudo']) == 0) {
+	$erreurs[] = "Le pseudo doit être reseigné";
+}
+
+if(count($erreurs)>0){
+	// Erreurs
+	echo implode("<br />", $erreurs);
+}else{
+	// Tout est bon on peut envoyer le mail
+	$pseudo = stripslashes($_POST['pseudo']);
+	$mail = stripslashes($_POST['mail']);
+	$message = stripslashes($_POST['message']);
+
+	$adresse = 'lou@yopmail.com';
+	$titre = "new message from: $pseudo";
+	$contenu = "$pseudo envoie le message suivant : \n\n$message \n\n Adresse mail du destinataire : $mail";
+	$headers = 'From : "Lou"<'.$mail.'>'."\n";
+		//Envoi de l'email :
+
+
+	if(mail($adresse,$titre,$contenu,$headers)){
+		echo "Votre message a bien été envoyé";
+	}else{
+		echo "Une erreur est servenue, votre message n'a pas été envoyé ! Veuillez réessayer ultérieurement";
+	}	
+}
+
+
+echo '
 <br />
 <br />
 <a href="index.php">Revenir à la page contact</a>
-
-
+';
+?>
