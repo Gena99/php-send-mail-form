@@ -43,7 +43,7 @@ if(count($erreurs)>0){
 	if(mail($adresse,$titre,$contenu,$headers)){
 		echo "Votre message a bien été envoyé";
 	}else{
-		echo "Une erreur est servenue, votre message n'a pas été envoyé ! Veuillez réessayer ultérieurement";
+		echo "Une erreur est servenue (heroku ne gère pas l'envoi de mail), votre message n'a pas été envoyé ! Veuillez réessayer ultérieurement";
 	}	
 }
 
